@@ -41,6 +41,7 @@ Route::middleware('auth:sanctum')->group(function() {
     Route::get('/get/pengaduan', [PengaduanControllers::class, 'index']);
     Route::get('/get/pengaduan/{id}', [PengaduanControllers::class, 'getPengaduanById']);
     Route::get('/pengaduan/user', [PengaduanControllers::class, 'getPengaduanByUserId']);
+    Route::delete('/delete/pengaduan/{id}', [PengaduanControllers::class, 'deletePengaduanById']);
 
     //pengaduan route
     Route::post('/add/{id}/tanggapan', [TanggapanControllers::class, 'addTanggapan']);

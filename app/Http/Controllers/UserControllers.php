@@ -25,7 +25,7 @@ class UserControllers extends Controller
             'password' => 'required|string|min:8',
             'no_telepon' => 'required|string|regex:/^\+?[0-9]{8,15}$/',
             'role' => 'nullable|string',
-            'profile_picture' => 'nullable|image|mimes:jpg,png,jpg|max:2048'
+            'profile_picture' => 'nullable|image|mimes:jpg,png,jpeg|max:2048'
         ]);
     
         // Jika validasi gagal, kembalikan pesan error
@@ -101,14 +101,7 @@ class UserControllers extends Controller
     
             return response()->json([
                 'token' => $token,
-                'user' => [
-                    'id' => $user->id,
-                    'nama' => $user->nama,
-                    'email' => $user->email,
-                    'role' => $user->role,
-                    'no_telepon' => $user->no_telepon,
-                    'profile_picture' => $user->profile_picture,
-                ],
+                'user' => $user,
                 'success' => true,
                 'message' => 'Selamat, Anda berhasil login!',
             ], 200);

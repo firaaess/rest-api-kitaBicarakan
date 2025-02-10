@@ -3,7 +3,11 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Mail\NotifikasiPengaduan;
+use App\Mail\NotifikasiPengaduanStatus;
 use App\Models\Pengaduan;
+use App\Models\User;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary; // Pastikan Cloudinary terimport
 
@@ -63,6 +67,10 @@ class PengaduanControllers extends Controller
                 'status' => 'proses'
             ]);
 
+            // Kirim email ke admin
+            $adminEmail = User::where('role', 'admin')->pluck('email')->toArray();
+            Mail::to($adminEmail)->send(new NotifikasiPengaduan($pengaduan));
+
             return response()->json(['message' => 'Pengaduan berhasil ditambahkan', 'success' => true], 201);
         } catch (\Exception $e) {
             return response()->json(['error' => 'Terjadi kesalahan saat menyimpan data. ' . $e->getMessage()], 500);
@@ -107,7 +115,6 @@ class PengaduanControllers extends Controller
     }
     public function updateStatusPengaduan(Request $request, $id)
     {
-        // Validasi input
         $validated = Validator::make($request->all(), [
             'status' => 'required|string|in:proses,diterima,selesai',
         ]);
@@ -117,21 +124,64 @@ class PengaduanControllers extends Controller
         }
     
         try {
-            // Cari pengaduan berdasarkan ID
             $pengaduan = Pengaduan::find($id);
     
             if (!$pengaduan) {
                 return response()->json(['message' => 'Pengaduan tidak ditemukan', 'success' => false], 404);
             }
     
-            // Update status pengaduan
             $pengaduan->status = $request->status;
             $pengaduan->save();
     
-            return response()->json(['message' => 'Status pengaduan berhasil diperbarui', 'success' => true, 'data' => $pengaduan], 200);
+            // Ambil email user yang bikin pengaduan
+            $emailPelapor = $pengaduan->user->email ?? null;
+    
+            // Ambil semua email user dengan role 'petugas'
+            $emailsPetugas = User::where('role', 'petugas')->pluck('email')->toArray();
+    
+            // Gabungkan email pelapor dan petugas (hapus yang null/duplikat)
+            $allRecipients = array_unique(array_filter(array_merge([$emailPelapor], $emailsPetugas)));
+    
+            // Kirim email ke masing-masing penerima
+            foreach ($allRecipients as $email) {
+                Mail::to($email)->send(new NotifikasiPengaduanStatus($pengaduan));
+            }
+    
+            return response()->json([
+                'message' => 'Status pengaduan berhasil diperbarui dan email dikirim',
+                'success' => true,
+                'data' => $pengaduan
+            ], 200);
         } catch (\Exception $e) {
             return response()->json(['error' => 'Terjadi kesalahan saat memperbarui status. ' . $e->getMessage()], 500);
         }
     }
     
+
+    public function deletePengaduanById($id)
+    {
+        try {
+            // Cari kategori berdasarkan ID
+            $pengaduan = Pengaduan::find($id);
+
+            // Jika kategori tidak ditemukan
+            if (!$pengaduan) {
+                return response()->json(['message' => 'Pengaduan tidak ditemukan', 'success' => true], 404);
+            }
+
+            // Hapus user
+            $pengaduan->delete();
+
+            return response()->json([
+                'message' => 'pengaduan berhasil dihapus.',
+                'success' => true,
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => 'Terjadi kesalahan saat menghapus data. ' . $e->getMessage(),
+                'success' => false
+            ], 500);
+        }
+    }
+
 }

@@ -32,11 +32,11 @@ class LokasiControllers extends Controller
 
         try {
 
-        $user = Lokasi::create([
+        $lokasi = Lokasi::create([
             'nama' => $request->nama,
         ]);
 
-        return response()->json(['message' => 'lokasi berhasil ditambahkan.', 'success' => true], 201);
+        return response()->json(['message' => 'lokasi berhasil ditambahkan.', 'success' => true, 'data' => $lokasi], 201);
     }
     catch (\Exception $e) {
         return response()->json(['error' => 'Terjadi kesalahan saat menyimpan data. '. $e->getMessage()], 500);
