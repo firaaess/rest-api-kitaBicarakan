@@ -21,7 +21,7 @@ class CorsMiddleware
         }
     
         return $next($request)
-            ->header('Access-Control-Allow-Origin', ['http://localhost:5173','https://kita-bicarakan.vercel.app/'])  // Allow your specific frontend domain
+            ->header('Access-Control-Allow-Origin', ['http://localhost:5173','https://kita-bicarakan.vercel.app'])  // Allow your specific frontend domain
             ->header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
             ->header('Access-Control-Allow-Headers', 'Content-Type, X-Requested-With, Authorization')
             ->header('Access-Control-Allow-Credentials', 'true');
