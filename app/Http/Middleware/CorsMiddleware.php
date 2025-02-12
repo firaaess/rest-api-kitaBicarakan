@@ -16,15 +16,22 @@ class CorsMiddleware
      */
     public function handle(Request $request, Closure $next)
     {
-        if ($request->getMethod() == "OPTIONS") {
-            return response()->json([], 200);  // Handle preflight requests
+        $allowedOrigins = [
+            'http://localhost:5173',
+            'https://kita-bicarakan.vercel.app'
+        ];
+
+        $origin = $request->header('Origin');
+
+        $response = $next($request);
+
+        if (in_array($origin, $allowedOrigins)) {
+            $response->header('Access-Control-Allow-Origin', $origin);
         }
-    
-        return $next($request)
-            ->header('Access-Control-Allow-Origin', ['http://localhost:5173','https://kita-bicarakan.vercel.app'])  // Allow your specific frontend domain
+
+        return $response
             ->header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
             ->header('Access-Control-Allow-Headers', 'Content-Type, X-Requested-With, Authorization')
             ->header('Access-Control-Allow-Credentials', 'true');
     }
-    
 }
