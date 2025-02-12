@@ -19,7 +19,7 @@ return [
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => ['http://localhost:5173'], // Replace with your frontend URL if needed
+    'allowed_origins' => ['http://localhost:5173', 'https://kita-bicarakan.vercel.app'], // Replace with your frontend URL if needed
 
     'allowed_origins_patterns' => [],
 
