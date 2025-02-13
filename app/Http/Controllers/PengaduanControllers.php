@@ -21,6 +21,11 @@ class PengaduanControllers extends Controller
     // Query pengaduan
     $pengaduanQuery = Pengaduan::with(['user', 'lokasi', 'kategory']);
 
+    // Jika user adalah petugas, filter pengaduan yang bukan berstatus 'proses'
+    if ($userRole === 'petugas') {
+        $pengaduanQuery->where('status', '!=', 'proses');
+    }
+
     // Eksekusi query dan ambil hasil
     $pengaduan = $pengaduanQuery->get();
 
