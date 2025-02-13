@@ -27,6 +27,6 @@ class Pengaduan extends Model
 
     public function lokasi()
     {
-        return $this->belongsTo(lokasi::class, 'lokasi_id');   
+        return $this->belongsTo(Lokasi::class, 'lokasi_id');   
     }
 }
